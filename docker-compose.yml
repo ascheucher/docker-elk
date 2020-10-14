@@ -11,9 +11,7 @@ services:
         source: ./elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
+      - elk-elasticsearch:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -24,7 +22,7 @@ services:
       # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
     networks:
-      - elk
+      - otaya-docker-net
 
   logstash:
     build:
@@ -47,7 +45,7 @@ services:
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-      - elk
+      - otaya-docker-net
     depends_on:
       - elasticsearch
 
@@ -64,13 +62,14 @@ services:
     ports:
       - "5601:5601"
     networks:
-      - elk
+      - otaya-docker-net
     depends_on:
       - elasticsearch
 
 networks:
-  elk:
-    driver: bridge
+  otaya-docker-net:
+    external: true
 
 volumes:
-  elasticsearch:
+  elk-elasticsearch:
+    external: true
